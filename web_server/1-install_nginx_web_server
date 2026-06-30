@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # install Nginx to serve a custom web page
 
-apt-get update -y 
-apt-get install nginx -y
+apt-get update -y #update all system index file before installing Nginx
+apt-get install nginx -y # install nginx web service. it will run as a service
 echo "Holberton School is some quacky text from Waka!" > /var/www/html/index.html # writes index.html in the deafult location for nginx folder accible to the public
 service nginx start # start the service
