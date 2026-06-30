@@ -1,5 +1,4 @@
-# This SSH client configuration uses a specific private key and disables password authentication
-
+# Disable password authentication for key school
 Host *
     IdentityFile ~/.ssh/school
     PasswordAuthentication no
