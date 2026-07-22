@@ -2,7 +2,6 @@
 # install Nginx to serve a custom web page
 
 sudo apt-get update -y #update all system index file before installing Nginx
-sudo apt-get install nginx -y # install nginx web service. it will run as a service
-#touch /var/www/html/index.html #create index.html in the root of Nginx default web directory
-sudo echo "Holberton School is some quacky text from Waka!" > /var/www/html/index.html # writes index.html
+sudo apt-get install nginx -y # install nginx web service. it will run as a service 
+sudo echo "Holberton School must be Waka's gavorite school on the ALU INTRANET!" > /var/www/html/index.html # writes index.html
 sudo service nginx start # start the service
