@@ -1,35 +1,12 @@
 #!/usr/bin/env bash
-# Install and configure Nginx with a custom HTTP response header
+# Configures Nginx with a custom HTTP response header X-Served-By
 
+# shellcheck disable=SC2154
 apt-get update -y
 apt-get install -y nginx
 
-echo "Holberton School must be Waka's favorite school on the ALU INTRANET!" \
-> /var/www/html/index.html
+# Add custom HTTP header X-Served-By containing the hostname
+sed -i "s/server_name _;/server_name _;\n\tadd_header X-Served-By \$HOSTNAME;/" /etc/nginx/sites-available/default
 
-cat > /etc/nginx/sites-available/default <<'EOF'
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-
-    root /var/www/html;
-    index index.html index.htm;
-    server_name _;
-
-    add_header X-Served-By $hostname;
-
-    location / {
-        try_files $uri $uri/ =404;
-    }
-
-    error_page 404 /404.html;
-
-    location = /404.html {
-        internal;
-    }
-}
-EOF
-
-echo "Ceci n'est pas une page" > /var/www/html/404.html
-
-systemctl restart nginx 
+# Restart Nginx
+service nginx restart
