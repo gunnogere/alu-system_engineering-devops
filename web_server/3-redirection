@@ -25,4 +25,4 @@ server {
 }
 EOF
 
-systemctl restart nginx
+nginx -t && systemctl reload nginx 
