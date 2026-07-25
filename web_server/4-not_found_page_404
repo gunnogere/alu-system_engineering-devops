@@ -1,43 +1,15 @@
 #!/usr/bin/env bash
-# Install and configure Nginx with a custom 404 page
+# Configures Nginx server to serve a custom 404 page
 
 apt-get update -y
 apt-get install -y nginx
 
-# Create the default index page
-echo "Holberton School must be Waka's favorite school on the ALU INTRANET!" \
-> /var/www/html/index.html
+# Create the custom 404 page in both standard Nginx document roots
+echo "Ceci n'est pas une page" > /var/www/html/custom_404.html
+echo "Ceci n'est pas une page" > /usr/share/nginx/html/custom_404.html
 
-# Create the custom 404 HTML page
-echo "Ceci n'est pas une page" > /var/www/html/404.html
+# Inject error_page configuration into default site config
+sed -i '/server_name _;/a \    error_page 404 /custom_404.html;' /etc/nginx/sites-available/default
 
-# Configure Nginx
-cat > /etc/nginx/sites-available/default <<'EOF'
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-
-    root /var/www/html;
-    index index.html index.htm;
-    server_name _;
-
-    # Redirect task
-    location ^~ /redirect_me {
-        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
-    }
-
-    # Custom 404 configuration
-    error_page 404 /404.html;
-    location = /404.html {
-        root /var/www/html;
-        internal;
-    }
-
-    location / {
-        try_files $uri $uri/ =404;
-    }
-}
-EOF
-
-# Test configuration and restart Nginx
-nginx -t && service nginx restart
+# Restart Nginx service
+service nginx restart
