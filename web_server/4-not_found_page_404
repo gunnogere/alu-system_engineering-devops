@@ -8,19 +8,8 @@ apt-get install -y nginx
 echo "Holberton School must be Waka's favorite school on the ALU INTRANET!" \
 > /var/www/html/index.html
 
-# Create the custom 404 page
-cat > /var/www/html/5-design_a_beautiful_404_page.html <<'EOF'
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>404 Not Found</title>
-</head>
-<body>
-    Ceci n'est pas une page
-</body>
-</html>
-EOF
+# Create the custom 404 HTML page
+echo "Ceci n'est pas une page" > /var/www/html/404.html
 
 # Configure Nginx
 cat > /etc/nginx/sites-available/default <<'EOF'
@@ -37,8 +26,12 @@ server {
         return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
     }
 
-    # Custom 404 page
-    error_page 404 /5-design_a_beautiful_404_page.html;
+    # Custom 404 configuration
+    error_page 404 /404.html;
+    location = /404.html {
+        root /var/www/html;
+        internal;
+    }
 
     location / {
         try_files $uri $uri/ =404;
@@ -47,5 +40,4 @@ server {
 EOF
 
 # Test configuration and restart Nginx
-nginx -t || exit 1
-service nginx restart
+nginx -t && service nginx restart
