@@ -1,21 +1,33 @@
 #!/usr/bin/env bash
-#install and configure haproxy on a load_balancer
+# Configures HAProxy on a load balancer with round-robin distribution
+
+# Update packages and install HAProxy
 sudo apt-get update -y
+sudo apt-get install -y haproxy
 
-sudo apt-get install haproxy -y
+# Build HAProxy configuration block
+HAPROXY_CONFIG="
+frontend http_front
+    bind *:80
+    mode http
+    default_backend http_back
 
-server_config=\
+backend http_back
+    mode http
+    balance roundrobin
+    server 7148-web-01 54.158.136.212:80 check
+    server 7148-web-02 3.83.151.210:80 check
 "
-frontend balancer_http_in
-        bind *:80
-        mode http
-        default_backend benson-backend
 
-backend balancer-backend
-        balance roundrobin
-        server 7142-web-01 	54.158.136.212:80 check
-        server 7142-web-02 	3.83.151.210:80 check
-"
-echo "$server_config" |sudo tee -a /etc/haproxy/haproxy.cfg
-echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
+# Append configuration if not already present (prevents duplicates on re-runs)
+if ! grep -q "frontend http_front" /etc/haproxy/haproxy.cfg; then
+    echo "$HAPROXY_CONFIG" | sudo tee -a /etc/haproxy/haproxy.cfg > /dev/null
+fi
+
+# Enable HAProxy init script
+if ! grep -q "ENABLED=1" /etc/default/haproxy; then
+    echo "ENABLED=1" | sudo tee -a /etc/default/haproxy > /dev/null
+fi
+
+# Restart HAProxy service to apply changes
 sudo service haproxy restart
