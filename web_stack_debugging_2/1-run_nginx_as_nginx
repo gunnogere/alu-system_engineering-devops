@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Configure Nginx to listen on port 8080 and run as the nginx user
+
+# Fix Nginx site config to listen on port 8080
+sed -i 's/listen 80/listen 8080/g' /etc/nginx/sites-available/default 2>/dev/null || true
+sed -i 's/listen \[::\]:80/listen \[::\]:8080/g' /etc/nginx/sites-available/default 2>/dev/null || true
+
+# Fix user directive in nginx.conf
+sed -i 's/user www-data;/user nginx;/g' /etc/nginx/nginx.conf 2>/dev/null || true
+sed -i 's/user root;/user nginx;/g' /etc/nginx/nginx.conf 2>/dev/null || true
+
+# Ensure permissions on Nginx working directories
+chown -R nginx:nginx /var/lib/nginx /var/log/nginx /run /etc/nginx 2>/dev/null || true
+
+# Stop current running instance of Nginx
+service nginx stop
+
+# Start Nginx as the nginx user
+su -c "nginx" nginx
