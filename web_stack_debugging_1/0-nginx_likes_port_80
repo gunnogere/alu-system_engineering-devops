@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
-# Fix Nginx port 80 issue by stopping conflicting services and restarting Nginx
+# Fixes Nginx configuration to make sure it listens on IPv4 port 80
 
-# Stop apache2 if running so port 80 is freed up
-service apache2 stop 2>/dev/null || true
+# Replace/fix any non-standard port or commented listen directives with port 80
+sed -i 's/listen 80 default_server;/listen 80;/g' /etc/nginx/sites-available/default 2>/dev/null || true
+sed -i 's/listen \[::\]:80 default_server;/listen \[::\]:80;/g' /etc/nginx/sites-available/default 2>/dev/null || true
 
-# Ensure the default Nginx configuration listens on port 80
-sed -i 's/listen [0-9]\+/listen 80/g' /etc/nginx/sites-available/default 2>/dev/null || true
-
-# Restart Nginx service
+# Ensure service nginx starts/restarts correctly
 service nginx restart
